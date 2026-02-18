@@ -2,7 +2,7 @@
 
 **Duality AI Offroad Semantic Segmentation Submission README**
 
-## 📌 Project Overview
+## Project Overview
 This project implements a semantic segmentation model trained on synthetic desert data provided by Duality AI. The objective is to segment terrain classes at the pixel level and evaluate generalization performance on unseen desert environments. 
 
 **Primary evaluation metric:** Mean Intersection over Union (IoU).
@@ -40,6 +40,10 @@ pip install streamlit opencv-python pandas numpy pillow
 streamlit run front_v2.py
 ```
 **Output samples**
-<img width="1920" height="1020" alt="Screenshot 2026-02-18 174012" src="https://github.com/user-attachments/assets/834aad76-b55c-4e71-86f9-1a12be448127" />
 
-<img width="1920" height="1020" alt="Screenshot 2026-02-18 173942" src="https://github.com/user-attachments/assets/aa82c80f-f86a-41d3-8358-01a8c0b94f8e" />
+<img width="1920" height="1080" alt="Screenshot 2026-02-18 174745" src="https://github.com/user-attachments/assets/03f57104-e7cc-444b-83a4-921bef890441" />
+<img width="1920" height="1080" alt="Screenshot 2026-02-18 174753" src="https://github.com/user-attachments/assets/0c40c5bc-44d0-4be4-bb68-341949fdfdc5" />
+
+The resultant meaan IOU was: 0.2537
+with a Pixel accuracy of : 60.68%
+and a Inference Time of : 241.58 ms
