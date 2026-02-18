@@ -5,6 +5,8 @@
 ## Project Overview
 This project implements a semantic segmentation model trained on synthetic desert data provided by Duality AI. The objective is to segment terrain classes at the pixel level and evaluate generalization performance on unseen desert environments. 
 
+The pre trained model here is not included as it exeeds upload limit on github
+
 **Primary evaluation metric:** Mean Intersection over Union (IoU).
 
 ---
