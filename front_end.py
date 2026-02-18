@@ -46,110 +46,74 @@ for i in range(len(cls)):
 if up_img:
     img_p = Image.open(up_img).convert("RGB")
     img_a = np.array(img_p)
-    
     t1 = time.time()
-    
-    h = img_a.shape[0]
-    w = img_a.shape[1]
+    h, w = img_a.shape[:2]
     
     if m is not None:
-        tr = T.Compose([
-            T.Resize((256, 256)),
-            T.ToTensor()
-        ])
+        tr = T.Compose([T.Resize((256, 256)), T.ToTensor()])
         in_t = tr(img_p).unsqueeze(0)
-        
         with torch.no_grad():
             out = m(in_t)["out"]
             probs = F.softmax(out[0], dim=0)
             conf_m = torch.max(probs, dim=0)[0].cpu().numpy()
-            
         p_t = torch.argmax(out, dim=1).squeeze(0)
-        p_m_s = p_t.byte().cpu().numpy()
-        p_m = cv2.resize(p_m_s, (w, h), interpolation=cv2.INTER_NEAREST)
+        p_m = cv2.resize(p_t.byte().cpu().numpy(), (w, h), interpolation=cv2.INTER_NEAREST)
         c_m_r = cv2.resize(conf_m, (w, h), interpolation=cv2.INTER_LINEAR)
     else:
         p_m = np.random.randint(0, len(cls), (h, w))
         c_m_r = np.random.uniform(0.5, 1.0, (h, w))
     
     t2 = time.time()
-    inf_t = round((t2 - t1) * 1000, 2)
+    st.write(f"Inference Time: {round((t2 - t1) * 1000, 2)} ms")
     
     ov = img_a.copy()
     for i in range(len(cols)):
         if i in sel_cls:
-            mask_i = p_m == i
-            ov[mask_i] = cols[i]
-            
+            ov[p_m == i] = cols[i]
     disp_img = cv2.addWeighted(ov, op, img_a, 1 - op, 0)
     
-    if m is None:
-        st.warning("model.pth file nahi mili!")
-    
-    st.write(f"Inference Time: {inf_t} ms")
-    
     c1, c2 = st.columns(2)
-    with c1:
-        st.image(img_p, caption="Original Image", use_container_width=True)
-    with c2:
-        st.image(disp_img, caption="Predicted Segmentation", use_container_width=True)
+    c1.image(img_p, caption="Original Image", use_container_width=True)
+    c2.image(disp_img, caption="Predicted Segmentation", use_container_width=True)
         
     gt_m = None
     if up_gt:
         gt_p = Image.open(up_gt)
-        gt_r = gt_p.resize((w, h), Image.NEAREST)
-        gt_a = np.array(gt_r)
-        
+        gt_a = np.array(gt_p.resize((w, h), Image.NEAREST))
         gt_m = np.full(gt_a.shape, 255, dtype=np.int64)
-        gt_m[gt_a == 100] = 0
-        gt_m[gt_a == 200] = 1
-        gt_m[gt_a == 300] = 2
-        gt_m[gt_a == 500] = 3
-        gt_m[gt_a == 550] = 4
-        gt_m[gt_a == 600] = 5
-        gt_m[gt_a == 700] = 6
-        gt_m[gt_a == 800] = 7
-        gt_m[gt_a == 7100] = 8
-        gt_m[gt_a == 10000] = 9
+        v_map = {100:0, 200:1, 300:2, 500:3, 550:4, 600:5, 700:6, 800:7, 7100:8, 10000:9}
+        for k, v in v_map.items(): gt_m[gt_a == k] = v
         
         gt_v = np.zeros((h, w, 3), dtype=np.uint8)
-        for i in range(len(cols)):
-            gt_v[gt_m == i] = cols[i]
-            
+        for i in range(len(cols)): gt_v[gt_m == i] = cols[i]
         err = np.where((p_m != gt_m) & (gt_m != 255), 255, 0).astype(np.uint8)
         
         c3, c4 = st.columns(2)
-        with c3:
-            st.image(gt_v, caption="Ground Truth Mask", use_container_width=True)
-        with c4:
-            st.image(err, caption="Error Map", use_container_width=True)
+        c3.image(gt_v, caption="Ground Truth Mask", use_container_width=True)
+        c4.image(err, caption="Error Map", use_container_width=True)
 
-    st.subheader("Metrics Table")
-    
+    st.subheader("Final Performance Metrics")
     m_data = []
+    ious = []
     for i in range(len(cls)):
         p_i = (p_m == i)
-        
-        if np.sum(p_i) > 0:
-            conf_val = round(np.mean(c_m_r[p_i]) * 100, 1)
-            conf_s = f"{conf_val}%"
-        else:
-            conf_s = "N/A"
-            
+        conf_s = f"{round(np.mean(c_m_r[p_i]) * 100, 1)}%" if np.sum(p_i) > 0 else "N/A"
+        iou_v = "N/A"
         if gt_m is not None:
             g_i = (gt_m == i)
             inter = np.logical_and(g_i, p_i).sum()
             union = np.logical_or(g_i, p_i).sum()
-            
             if union > 0:
                 iou_v = round(inter / union, 4)
-            else:
-                iou_v = "N/A"
-        else:
-            iou_v = "N/A (Upload GT)"
-            
+                ious.append(iou_v)
         m_data.append([cls[i], iou_v, conf_s])
         
-    m_df = pd.DataFrame(m_data, columns=["Class", "IoU Score", "Confidence"])
-    
-    st.table(m_df)
+    if gt_m is not None:
+        mask = (gt_m != 255)
+        acc = round(np.sum(p_m[mask] == gt_m[mask]) / np.sum(mask), 4)
+        miou = round(np.mean(ious), 4) if ious else 0
+        k1, k2 = st.columns(2)
+        k1.metric("Pixel Accuracy", f"{round(acc*100, 2)}%")
+        k2.metric("Mean IoU (mIoU)", miou)
+
+    st.table(pd.DataFrame(m_data, columns=["Class", "IoU Score", "Confidence"]))
