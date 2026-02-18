@@ -1,0 +1,3 @@
+Due to upload limits for github the trained model was not uploaded 
+so kindly the dowload the model from the given google drive link
+https://drive.google.com/file/d/150Zw8uFTucFCkd2pdKD46F5qSnzPGusL/view?usp=drive_link
