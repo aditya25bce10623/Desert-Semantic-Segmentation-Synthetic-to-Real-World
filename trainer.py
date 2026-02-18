@@ -47,14 +47,15 @@ class DesertDataset(Dataset):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = deeplabv3_resnet50(weights=None, num_classes=10).to(device)
 loss_fn = nn.CrossEntropyLoss(ignore_index=255)
-opt = torch.optim.Adam(model.parameters(), lr=0.0001)
+opt = torch.optim.Adam(model.parameters(), lr=0.0002)
+sched = torch.optim.lr_scheduler.StepLR(opt, step_size=20, gamma=0.1)
 
 train_imgs = r"D:\statathon\Offroad_Segmentation_Training_Dataset\train\color_images"
 train_masks = r"D:\statathon\Offroad_Segmentation_Training_Dataset\train\Segmentation"
-epochs = 10
+epochs = 40
 
 dataset = DesertDataset(train_imgs, train_masks)
-loader = DataLoader(dataset, batch_size=4, shuffle=True, drop_last=True)
+loader = DataLoader(dataset, batch_size=8, shuffle=True, drop_last=True)
 total_batches = len(loader)
 
 for e in range(epochs):
@@ -74,9 +75,11 @@ for e in range(epochs):
         
         total_loss += loss.item()
         
-        print("Epoch:", e, "Batch:", batch_num, "/", total_batches, "Loss:", round(loss.item(), 4))
+        print("Epoch:", e+1, "Batch:", batch_num, "/", total_batches, "Loss:", round(loss.item(), 4))
         batch_num += 1
         
-    print("Epoch", e, "Completed! Total Loss:", round(total_loss, 4))
+    sched.step()
+    curr_lr = sched.get_last_lr()[0]
+    print("Epoch", e+1, "Completed! Total Loss:", round(total_loss, 4), "LR:", curr_lr)
     
-torch.save(model, "D:\statathon\model.pth")
+torch.save(model, r"D:\statathon\model.pth")
