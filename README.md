@@ -64,9 +64,10 @@ streamlit run front_v2.py
 
 **Output samples**
 
-<img width="1920" height="1080" alt="Screenshot 2026-02-18 174745" src="https://github.com/user-attachments/assets/03f57104-e7cc-444b-83a4-921bef890441" />
-<img width="1920" height="1080" alt="Screenshot 2026-02-18 174753" src="https://github.com/user-attachments/assets/0c40c5bc-44d0-4be4-bb68-341949fdfdc5" />
+<img width="1920" height="1080" alt="Screenshot 2026-02-18 184340" src="https://github.com/user-attachments/assets/d8a08d69-04f3-4d12-bd1e-c1b00fcca5b8" />
+<img width="1920" height="1080" alt="Screenshot 2026-02-18 184349" src="https://github.com/user-attachments/assets/896837a7-b040-4dc1-b2aa-dba85511e62a" />
 
 *The resultant meaan IOU was: 0.2537*
 *with a Pixel accuracy of : 60.68%*
 *and a Inference Time of : 241.58 ms*
+*also a highest mAP50 score of : 0.25*
