@@ -41,11 +41,30 @@ pip install streamlit opencv-python pandas numpy pillow
 ```bash
 streamlit run front_v2.py
 ```
+## Methodology
+
+### 1. Model Architecture
+* **Network:** DeepLabV3 with a **ResNet50** backbone.
+* **Reasoning:** DeepLabV3 utilizes Atrous Spatial Pyramid Pooling (ASPP) to capture multi-scale contextual information. This is highly effective for segmenting varied desert terrains, helping the model understand both vast landscapes and small, intricate objects like dry bushes.
+
+### 2. Data Preprocessing
+* **Resolution:** All input images and ground truth masks are standardized to `256x256` pixels for optimal memory utilization and faster computation.
+* **Class Mapping:** The raw dataset masks contained specific arbitrary pixel values (e.g., 100, 200, 7100) which were systematically mapped to 10 sequential classes (0-9). 
+* **Ignore Index:** Unclassified or border pixels were remapped to `255` and explicitly excluded from the loss calculation (`ignore_index=255`) to prevent skewed training results.
+
+### 3. Training Strategy
+* **Hardware:** Trained leveraging an NVIDIA RTX 4060 GPU (8GB VRAM) for accelerated processing.
+* **Hyperparameters:** Batch Size = 8, Total Epochs = 40.
+* **Loss Function:** `CrossEntropyLoss`.
+* **Optimizer:** `Adam` optimizer with an initial learning rate of `0.0002` for fast, adaptive, and stable convergence.
+* **Learning Rate Scheduler:** `StepLR` (step_size=20, gamma=0.1). The learning rate is actively decayed by 90% after the 20th epoch. This technique allows the model to initially learn broad features (like sky and ground) and later fine-tune its weights to detect smaller, difficult classes with higher precision.
+
+
 **Output samples**
 
 <img width="1920" height="1080" alt="Screenshot 2026-02-18 174745" src="https://github.com/user-attachments/assets/03f57104-e7cc-444b-83a4-921bef890441" />
 <img width="1920" height="1080" alt="Screenshot 2026-02-18 174753" src="https://github.com/user-attachments/assets/0c40c5bc-44d0-4be4-bb68-341949fdfdc5" />
 
-The resultant meaan IOU was: 0.2537
-with a Pixel accuracy of : 60.68%
-and a Inference Time of : 241.58 ms
+*The resultant meaan IOU was: 0.2537*
+*with a Pixel accuracy of : 60.68%*
+*and a Inference Time of : 241.58 ms*
