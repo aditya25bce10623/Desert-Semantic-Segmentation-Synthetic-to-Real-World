@@ -22,3 +22,20 @@ This project implements a semantic segmentation model trained on synthetic deser
 **1. Create virtual environment:**
 ```bash
 python -m venv myenv
+```
+**2. Activate the Environment:**
+```bash
+.\myenv\Scripts\activate
+```
+**3. Install GPU Dependencies (PyTorch)**
+```bash
+pip install torch torchvision torchaudio --index-url [https://download.pytorch.org/whl/cu124](https://download.pytorch.org/whl/cu124)
+```
+**4. Install Project Libraries**
+```bash
+pip install streamlit opencv-python pandas numpy pillow
+```
+**How to Run**
+```bash
+streamlit run front_v2.py
+```
