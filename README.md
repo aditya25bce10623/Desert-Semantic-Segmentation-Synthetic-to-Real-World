@@ -39,3 +39,6 @@ pip install streamlit opencv-python pandas numpy pillow
 ```bash
 streamlit run front_v2.py
 ```
+**Output samples**
+![Uploading Screenshot 2026-02-18 140624.png…]()
+![Uploading Screenshot 2026-02-18 140631.png…]()
