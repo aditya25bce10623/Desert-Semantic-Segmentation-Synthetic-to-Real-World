@@ -112,8 +112,13 @@ if up_img:
         mask = (gt_m != 255)
         acc = round(np.sum(p_m[mask] == gt_m[mask]) / np.sum(mask), 4)
         miou = round(np.mean(ious), 4) if ious else 0
-        k1, k2 = st.columns(2)
+        
+        ap50_list = [1 if i >= 0.5 else 0 for i in ious]
+        map50 = round(np.mean(ap50_list), 4) if ap50_list else 0
+        
+        k1, k2, k3 = st.columns(3)
         k1.metric("Pixel Accuracy", f"{round(acc*100, 2)}%")
         k2.metric("Mean IoU (mIoU)", miou)
+        k3.metric("mAP50", map50)
 
     st.table(pd.DataFrame(m_data, columns=["Class", "IoU Score", "Confidence"]))
