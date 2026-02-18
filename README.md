@@ -40,7 +40,6 @@ pip install streamlit opencv-python pandas numpy pillow
 streamlit run front_v2.py
 ```
 **Output samples**
+<img width="1920" height="1020" alt="Screenshot 2026-02-18 174012" src="https://github.com/user-attachments/assets/834aad76-b55c-4e71-86f9-1a12be448127" />
 
-<img width="1920" height="1020" alt="Screenshot 2026-02-18 140624" src="https://github.com/user-attachments/assets/e96bc863-6bef-4b8d-89fb-635335568200" />
-
-<img width="1920" height="1020" alt="Screenshot 2026-02-18 140631" src="https://github.com/user-attachments/assets/e735fa10-0f0e-413c-9e74-ba10bc9a3ca0" />
+<img width="1920" height="1020" alt="Screenshot 2026-02-18 173942" src="https://github.com/user-attachments/assets/aa82c80f-f86a-41d3-8358-01a8c0b94f8e" />
